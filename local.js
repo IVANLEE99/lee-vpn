@@ -15,13 +15,14 @@ local
     .parse(process.argv);
 
 var relay = new TCPRelay({
-    localAddress: local.localAddress || '127.0.0.1',
-    localPort: local.localPort || 1080,
-    serverAddress: local.serverAddress || '127.0.0.1',
-    serverPort: local.serverPort || 8388,
-    password: local.password || 'shadowsocks-over-websocket',
-    method: local.method || 'aes-256-cfb'
+    localAddress: process.env['LOCALADDRESS'] || local.localAddress || '127.0.0.1',
+    localPort: process.env['LOCALPORT'] ||local.localPort || 1080,
+    serverAddress: process.env['SERVERADDRESS'] ||local.serverAddress || 'leevpn.herokuapp.com' ||'127.0.0.1',
+    serverPort: process.env['SERVERPORT'] ||local.serverPort || 8388,
+    password: process.env['PASSWORD'] || local.password || 'woshilixiang' || 'shadowsocks-over-websocket',
+    method: process.env['METHOD'] || local.method || 'aes-256-cfb'
 }, true);
+// process.env['METHOD']
 relay.setLogLevel(local.logLevel);
 relay.setLogFile(local.logFile);
 relay.bootstrap();

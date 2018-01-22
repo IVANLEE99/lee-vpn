@@ -26,8 +26,11 @@
     "bufferutil": "^3.0.0",
     "commander": "^2.9.0",
     "log4js": "^1.1.1",
+    "safe-buffer": "^5.1.1",
+    "semver": "^5.5.0",
     "shadowsocks": "^1.5.3",
     "throng": "^4.0.0",
+    "ultron": "^1.1.1",
     "ws": "^2.2.3"
   }
 }
