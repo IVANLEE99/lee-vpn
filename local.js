@@ -1,6 +1,9 @@
 const TCPRelay = require('./tcprelay').TCPRelay;
 const local = require('commander');
 const constants = require('./constants');
+const throng = require('throng');
+const log4js = require('log4js');
+const logger = log4js.getLogger('local');
 
 local
     .version(constants.VERSION)
@@ -14,16 +17,42 @@ local
     .option('--log-file <file>', 'log file')
     .parse(process.argv);
 
-var relay = new TCPRelay({
-    localAddress: process.env['LOCALADDRESS'] || local.localAddress || '127.0.0.1',
-    localPort: process.env['LOCALPORT'] || local.localPort || 5000,
-    // localPort: process.env.PORT || local.localPort || 5000,
-    serverAddress: process.env['SERVERADDRESS'] ||local.serverAddress || 'leevpn.herokuapp.com' ||'127.0.0.1',
-    serverPort: process.env['SERVERPORT'] ||local.serverPort || 8388,
-    password: process.env['PASSWORD'] || local.password || 'woshilixiang' || 'shadowsocks-over-websocket',
-    method: process.env['METHOD'] || local.method || 'aes-256-cfb'
-}, true);
-// process.env['METHOD']
-relay.setLogLevel(local.logLevel);
-relay.setLogFile(local.logFile);
-relay.bootstrap();
+throng({
+    workers: process.env.WEB_CONCURRENCY || 1,
+    master: startMaster,
+    start: startWorker
+});
+
+function startMaster() {
+    logger.info('started master');
+}
+
+function startWorker(id) {
+    logger.info(`started worker ${id}`);
+    var relay = new TCPRelay({
+        localAddress: process.env['LOCALADDRESS'] || local.localAddress || '127.0.0.1',
+        // localPort: process.env['LOCALPORT'] || local.localPort || 5000,
+        localPort: process.env['PORT'] || local.localPort || 5000,
+        serverAddress: process.env['SERVERADDRESS'] || local.serverAddress || 'leevpn.herokuapp.com' || '127.0.0.1',
+        serverPort: process.env['SERVERPORT'] || local.serverPort || 8388,
+        password: process.env['PASSWORD'] || local.password || 'woshilixiang' || 'shadowsocks-over-websocket',
+        method: process.env['METHOD'] || local.method || 'aes-256-cfb'
+    }, true);
+    // process.env['METHOD']
+    relay.setLogLevel(local.logLevel);
+    relay.setLogFile(local.logFile);
+    relay.bootstrap();
+}
+// var relay = new TCPRelay({
+//     localAddress: process.env['LOCALADDRESS'] || local.localAddress || '127.0.0.1',
+//     localPort: process.env['LOCALPORT'] || local.localPort || 5000,
+//     // localPort: process.env.PORT || local.localPort || 5000,
+//     serverAddress: process.env['SERVERADDRESS'] ||local.serverAddress || 'leevpn.herokuapp.com' ||'127.0.0.1',
+//     serverPort: process.env['SERVERPORT'] ||local.serverPort || 8388,
+//     password: process.env['PASSWORD'] || local.password || 'woshilixiang' || 'shadowsocks-over-websocket',
+//     method: process.env['METHOD'] || local.method || 'aes-256-cfb'
+// }, true);
+// // process.env['METHOD']
+// relay.setLogLevel(local.logLevel);
+// relay.setLogFile(local.logFile);
+// relay.bootstrap();
