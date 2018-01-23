@@ -16,7 +16,8 @@ local
 
 var relay = new TCPRelay({
     localAddress: process.env['LOCALADDRESS'] || local.localAddress || '127.0.0.1',
-    localPort: process.env['LOCALPORT'] ||local.localPort || 1080,
+    // localPort: process.env['LOCALPORT'] || local.localPort || 1080,
+    localPort: process.env['PORT'] || process.env['LOCALPORT'] || local.localPort || 1080,
     serverAddress: process.env['SERVERADDRESS'] ||local.serverAddress || 'leevpn.herokuapp.com' ||'127.0.0.1',
     serverPort: process.env['SERVERPORT'] ||local.serverPort || 8388,
     password: process.env['PASSWORD'] || local.password || 'woshilixiang' || 'shadowsocks-over-websocket',
